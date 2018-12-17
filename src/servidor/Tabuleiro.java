@@ -1,6 +1,6 @@
+package servidor;
 
-
-public class Tabuleiro {
+public class Tabuleiro implements java.io.Serializable {
 
 	int sizeX;
 	int sizeY;

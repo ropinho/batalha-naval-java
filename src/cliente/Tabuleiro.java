@@ -1,6 +1,6 @@
+package cliente;
 
-
-public class Tabuleiro {
+public class Tabuleiro implements java.io.Serializable {
 
 	int sizeX;
 	int sizeY;
@@ -14,6 +14,7 @@ public class Tabuleiro {
 		tab = new char[x][y];
 		this.initTab();
 	}
+
 
 	public void initTab() {
 		for (int i=0; i<sizeX; i++)

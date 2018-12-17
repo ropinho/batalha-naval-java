@@ -1,9 +1,10 @@
+package cliente;
 /*
  * by: Ronaldd Pinho
  * ronaldppinho@gmail.com
  */
 
-public class Jogador implements Serializable {
+public class Jogador implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 	final int MAX_BARCOS = 10;
@@ -62,6 +63,7 @@ public class Jogador implements Serializable {
 	//----------------------------------------------------------------------//
 
 	public void printTab(){
+		System.out.println("Mapa de "+ this.nome);
 		this.tab.print();
 	}
 

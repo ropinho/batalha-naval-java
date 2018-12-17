@@ -1,3 +1,5 @@
+package servidor;
+
 import java.util.Scanner;
 
 public class Batalha extends java.lang.Thread {

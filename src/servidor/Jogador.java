@@ -1,9 +1,10 @@
+package servidor;
 /*
  * by: Ronaldd Pinho
  * ronaldppinho@gmail.com
  */
 
-public class Jogador {
+public class Jogador implements java.io.Serializable {
 
 	final int MAX_BARCOS = 10;
 
