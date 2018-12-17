@@ -1,3 +1,5 @@
+package cliente;
+
 import java.net.Socket;
 import java.net.InetAddress;
 
@@ -10,7 +12,7 @@ public class StartCliente {
     try {
       ip = InetAddress.getLocalHost().getHostAddress();
       int port = 8000;
-      
+
       cliente = new Socket(ip, port);
       System.out.println("Conectado a porta "+ port);
 
