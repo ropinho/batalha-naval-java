@@ -7,8 +7,25 @@ public class StartCliente {
 
   static Socket cliente;
   static String ip;
+  static Scanner in;
+  static Jogador player;
+
+  // cria o jogador para o jogo
+  public static void createPlayer(){
+    System.out.print("Digite o seu nome para o jogo: ");
+    String nome = in.next();
+    player = new Jogador(nome);
+  }
+
+
+  public static void configurePlayerMap(){
+
+  }
+
 
   public static void main(String[] args) {
+    in = new Scanner(System.in)
+
     try {
       ip = InetAddress.getLocalHost().getHostAddress();
       int port = 8000;

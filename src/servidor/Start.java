@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.InetAddress;
 import java.util.Scanner;
 import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
 public class StartServidor {
 
@@ -14,10 +15,12 @@ public class StartServidor {
   static int sizeX;
   static int sizeY;
   static Scanner teclado, in_client1, in_client2;
-
-  static ObjectOutputStream objout;
-
   static Jogador jog1, jog2;
+
+
+  public static void getPlayersFromClients(){
+    
+  }
 
 
   public static void main(String[] args) {
