@@ -1,0 +1,8 @@
+#,Servidor,Cliente
+1,Criar Jogador,Criar jogador
+2,Distribuir barcos,Distribuir barcos
+3,Aguardar conexão,Conectar ao servidor
+4,Receber objeto oponente,Enviar jogador por servidor
+5,Criar objeto batalha,Receber batalha
+6,Eviar batalha pro cliente,Esperar o inicio da batalha
+7,iniciar batalha,

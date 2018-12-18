@@ -47,4 +47,28 @@ public class Tabuleiro implements Serializable {
 		System.out.println("");
 	}
 
+
+	public void printSecret() {
+		System.out.println("");
+
+		System.out.printf("     ");
+		for (int j=0; j<sizeY; j++)
+			System.out.printf("%d ", j); // imprime índices das colunas
+		System.out.println("");
+
+		for (int i=0; i<sizeX; i++) {
+			System.out.printf("  %d  ", i); // imprime o numero da linha
+
+			for (int k=0; k<sizeY; k++){
+				if (tab[i][k] == '~' || tab[i][k] == 'B')
+					System.out.printf("* ");
+				else
+					System.out.printf("%c ", tab[i][k]);
+			} // imprime linha inteira
+
+			System.out.println(""); // vai pra próxima linha
+		}
+		System.out.println("");
+	}
+
 }

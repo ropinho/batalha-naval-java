@@ -1,6 +1,7 @@
-package socket;
+package cliente;
 
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.InetAddress;
 import java.util.Scanner;
 import java.io.ObjectOutputStream;
@@ -15,7 +16,8 @@ public class Start {
   static Socket socket;
   static String ip;
   static Scanner in;
-  static Jogador player;
+  static Jogador jogador;
+  static Partida partida;
 
   static ObjectInputStream istream;
   static ObjectOutputStream ostream;
@@ -23,76 +25,74 @@ public class Start {
   static DataOutputStream dos;
 
 
+  public static void print(String s){
+    System.out.println(s);
+  }
+
   // cria o jogador para o jogo
   public static void createPlayer(){
     System.out.print("Digite o seu nome para o jogo: ");
     String nome = in.next();
-    player = new Jogador(nome);
+    jogador = new Jogador(nome);
+    System.out.println("Jogador criado!");
   }
 
   // configura o mapa do jogador posicionando os barcos na matriz
   public static void configurePlayerMap(){
     int x, y;
     System.out.println("Posicione as embarcações usando os índices X e Y.");
-    while (player.getNumBarcos() < player.MAX_BARCOS){
-      player.printTab();
+    while (jogador.getNumBarcos() < jogador.MAX_BARCOS){
+      jogador.printTab();
 			System.out.print("x: ");
 			x = in.nextInt();
 			System.out.print("y: ");
 			y = in.nextInt();
-			player.posicionarBarco(x, y);
-			System.out.printf("Adicionado! (%d/%d)\n", player.getNumBarcos(), player.MAX_BARCOS);
+			jogador.posicionarBarco(x, y);
+			System.out.printf("Adicionado! (%d/%d)\n", jogador.getNumBarcos(), jogador.MAX_BARCOS);
     }
+    System.out.println("Meu mapa de embarcações:");
+    jogador.printTab();
   }
 
-  // envia jogador para o servidor
-  public static void sendPlayer(){
-    try {
-      ObjectOutputStream ostream = new ObjectOutputStream(socket.getOutputStream());
-      ostream.flush();
-      ostream.writeObject(player);
-      ostream.close();
-    } catch(Exception e){
-      System.out.println(e.toString());
-    }
-  }
 
 
   public static void main(String[] args) {
     in = new Scanner(System.in);
 
+    // criar o seu jogador
     createPlayer();
+    // distribuir embarcações no mapa
     configurePlayerMap();
 
+    // conectar: digite a porta em que deseja se conectar
     System.out.print("Digite o número da porta para conectar: ");
     int port = in.nextInt();
-
     try {
       ip = InetAddress.getLocalHost().getHostAddress();
       socket = new Socket(ip, port);
-      System.out.println("Conectado a porta "+ port);
-      sendPlayer(); // enviar obj jogador para o servidor
+      System.out.printf("Conectado a porta %d, IP: %s\n", port, socket.getInetAddress().getHostAddress());
 
+      // enviar o jogador para o servidor
+      ostream = new ObjectOutputStream(socket.getOutputStream());
+      print("Enviando meu jogador para o servidor...");
+      ostream.writeObject(jogador);
+      ostream.flush();
+
+      // receber o obj batalha
+      print("aguardando batalha...");
+      istream = new ObjectInputStream(socket.getInputStream());
+      print("(...)");
+      partida = (Partida) istream.readObject();
+      print("(...)");
+
+
+      ostream.close();
+      istream.close();
+      socket.close();
     } catch(Exception e) {
-      System.out.println("erro: "+ e.toString());
+      System.err.println("Erro: "+ e.toString());
     }
 
-    boolean batalha = false;
-    System.out.println("Aguardando servidor...");
-    // esse loop vai deixar o programa esperando até que o
-    // servidor emita um sinal booleano de que a batalha já pode começar
-
-    try {
-      dis = new DataInputStream(socket.getInputStream());
-      while (dis.read() != 1){
-
-      }
-      dis.close();
-    } catch(Exception e) {
-      e.getMessage();
-    }
-
-    System.out.println("Valor booleano = "+ batalha);
   }
 
 }

@@ -14,74 +14,81 @@ import game.*;
 public class Start {
 
   static ServerSocket servidor;
-  static Socket[] cliente = new Socket[2];
-  static Jogador[] player = new Jogador[2];
-  static int n = 0; // n conta num de clientes conectados
+  static Socket cliente;
+  static Jogador jogador, oponente;
 
   // streams de entrada e saída para objetos e dados primitivos
+  static Scanner in = new Scanner(System.in);
   static ObjectInputStream istream;
   static ObjectOutputStream ostream;
   static DataInputStream dis;
   static DataOutputStream dos;
 
 
-  public static Jogador getPlayerFromClient(Socket socket){
-    try {
-      istream = new ObjectInputStream(socket.getInputStream());
-      Jogador j = (Jogador) istream.readObject();
-      istream.close();
-      return j;
-    } catch(Exception e) {
-      System.out.println(e.toString());
-    }
-    return null;
+  public static void print(String s){
+    System.out.println(s);
   }
 
-  public static void sendPlayersData(){
-    try {
-      for (Socket skt : cliente){
-        ostream = new ObjectOutputStream(skt.getOutputStream());
-        ostream.writeObject(player);
-        ostream.close();
-      }
-    } catch(Exception e){
-      e.getMessage();
+  // cria o jogador para o jogo
+  public static void createPlayer(){
+    System.out.print("Digite o seu nome para o jogo: ");
+    String nome = in.next();
+    jogador = new Jogador(nome);
+    System.out.println("Jogador criado!");
+  }
+
+  // configura o mapa do jogador posicionando os barcos na matriz
+  public static void configurePlayerMap(){
+    int x, y;
+    System.out.println("Posicione as embarcações usando os índices X (Linha) e Y Coluna.");
+    while (jogador.getNumBarcos() < jogador.MAX_BARCOS){
+      jogador.printTab();
+			System.out.print("Linha X: ");
+			x = in.nextInt();
+			System.out.print("Coluna Y: ");
+			y = in.nextInt();
+			jogador.posicionarBarco(x, y);
+			System.out.printf("Adicionado! (%d/%d)\n", jogador.getNumBarcos(), jogador.MAX_BARCOS);
     }
+    System.out.println("Meu mapa de embarcações:");
+    jogador.printTab();
   }
 
 
   public static void main(String[] args) {
-    //teclado = new Scanner(System.in);
+
+    createPlayer(); // criar o seu jogador
+    configurePlayerMap(); // distribuir embarcações no mapa
 
     try {
-      // aguarda conexões com clientes na porta 8000
+      // aguardar uma conexão
       servidor = new ServerSocket(8000);
-      System.out.println("Aguardando conexões na porta 8000");
+      print("Aguardando conexão na porta 8000");
+      cliente = servidor.accept();
+      print("Host "+ cliente.getInetAddress().getHostName()+" ("+ cliente.getInetAddress().getHostAddress()+ ") se conectou");
 
-      // loop aguarda por duas conexões clientes
-      // encerra quando dois clientes conectam-se
-      while (n < 2){
-        cliente[n] = servidor.accept();
-        System.out.print("Cliente conectado: "+ cliente[n].getInetAddress().getHostName() + "  " + cliente[n].getInetAddress().getHostAddress());
-        player[n] = getPlayerFromClient(cliente[n]); // ler obj jogador
-        System.out.printf("  (%s)\n", player[n].getNome());
-        n++;
-      }
+      // receber o jogador do cliente conectado
+      print("Recebendo jogador adversário...");
+      istream = new ObjectInputStream(cliente.getInputStream());
+      oponente = (Jogador) istream.readObject();
+      print("Você: "+ jogador.getNome());
+      print("Adversário: "+ oponente.getNome());
 
-      System.out.println("Iniciando batalha...");
-      Partida partida = new Partida(player[0], player[1]);
+      // criar partida
+      Partida partida = new Partida(jogador, oponente);
+      print("Partida criada!");
 
-      while (true) {
-        Jogador atk, def, aux;
+      // enviar partida para o adversario
+      ostream = new ObjectOutputStream(cliente.getOutputStream());
+      print("Enviando dados da batalha para o outro jogador...");
+      ostream.writeObject(partida);
 
 
-        if (player[0].getTiros() > 0 && player[1].getTiros() > 0) break;
-      }
 
-      cliente[0].close();
-      cliente[1].close();
+      istream.close();
+      ostream.close();
     } catch(Exception e){
-      System.out.println("erro: "+ e.toString());
+      System.out.println("Erro: "+ e.toString());
     }
   }
 }
