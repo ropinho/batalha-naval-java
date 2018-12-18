@@ -1,6 +1,7 @@
-package cliente;
+package game;
 
 import java.util.Scanner;
+import java.net.Socket;
 
 public class Batalha extends java.lang.Thread {
 

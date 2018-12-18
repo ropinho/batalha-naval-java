@@ -1,17 +1,27 @@
-package cliente;
+package socket;
 
 import java.net.Socket;
 import java.net.InetAddress;
 import java.util.Scanner;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+
+import game.*;
 
 public class Start {
 
-  static Socket cliente;
+  static Socket socket;
   static String ip;
   static Scanner in;
   static Jogador player;
+
+  static ObjectInputStream istream;
+  static ObjectOutputStream ostream;
+  static DataInputStream dis;
+  static DataOutputStream dos;
+
 
   // cria o jogador para o jogo
   public static void createPlayer(){
@@ -35,10 +45,10 @@ public class Start {
     }
   }
 
-
+  // envia jogador para o servidor
   public static void sendPlayer(){
     try {
-      ObjectOutputStream ostream = new ObjectOutputStream(cliente.getOutputStream());
+      ObjectOutputStream ostream = new ObjectOutputStream(socket.getOutputStream());
       ostream.flush();
       ostream.writeObject(player);
       ostream.close();
@@ -59,19 +69,30 @@ public class Start {
 
     try {
       ip = InetAddress.getLocalHost().getHostAddress();
-      cliente = new Socket(ip, port);
+      socket = new Socket(ip, port);
       System.out.println("Conectado a porta "+ port);
-
-      // enviar obj jogador para o servidor
-      sendPlayer();
+      sendPlayer(); // enviar obj jogador para o servidor
 
     } catch(Exception e) {
       System.out.println("erro: "+ e.toString());
     }
 
+    boolean batalha = false;
     System.out.println("Aguardando servidor...");
+    // esse loop vai deixar o programa esperando até que o
+    // servidor emita um sinal booleano de que a batalha já pode começar
 
+    try {
+      dis = new DataInputStream(socket.getInputStream());
+      while (dis.read() != 1){
 
+      }
+      dis.close();
+    } catch(Exception e) {
+      e.getMessage();
+    }
+
+    System.out.println("Valor booleano = "+ batalha);
   }
 
 }

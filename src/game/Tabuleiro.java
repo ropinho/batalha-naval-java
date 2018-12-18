@@ -1,6 +1,8 @@
-package cliente;
+package game;
 
-public class Tabuleiro implements java.io.Serializable {
+import java.io.Serializable;
+
+public class Tabuleiro implements Serializable {
 
 	int sizeX;
 	int sizeY;

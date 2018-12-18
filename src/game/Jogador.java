@@ -1,13 +1,17 @@
-package servidor;
+package game;
 /*
  * by: Ronaldd Pinho
  * ronaldppinho@gmail.com
  */
 
-public class Jogador implements java.io.Serializable {
+import java.io.Serializable;
 
-	final int MAX_BARCOS = 10;
+public class Jogador implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	public static final int MAX_BARCOS = 5;
+
+	private byte[] bytes;
 	private String nome;
 	private int n_tiros = 10;
 	private int n_barcos = 0;
@@ -16,7 +20,7 @@ public class Jogador implements java.io.Serializable {
 
 	public Jogador(String n){
 		this.nome = n;
-		this.tab = new Tabuleiro(10, 10);
+		this.tab = new Tabuleiro(5, 5);
 	}
 
 	//--- getters e setters -------------------------------------------------//
@@ -61,6 +65,7 @@ public class Jogador implements java.io.Serializable {
 	//----------------------------------------------------------------------//
 
 	public void printTab(){
+		System.out.println("Mapa de "+ this.nome);
 		this.tab.print();
 	}
 
