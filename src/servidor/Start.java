@@ -90,10 +90,12 @@ public class Start {
       int iteration=1, x, y;
       int[] coord = new int[2];
       Jogador atk, def;
+      char alvo;
+      String result="";
       partida.printServerTab();
 
       /* Loop da batalha */
-      while (iteration<=100) {
+      while (iteration<10) { //--------------------------------------------------------------//
         // definindo quem ataca e quem defende e enviando um sinal para o cliente
         if (iteration%2 == 1){ // se a iteração for ímpar, o servidor ataca
           // se for a vez do servidor atacar, envia 0 para o cliente
@@ -104,8 +106,22 @@ public class Start {
           x = in.nextInt();
           System.out.print("y: ");
           y = in.nextInt();
-          partida.jogadorAtaca(1, x, y);
+          alvo = partida.jogadorAtaca(1, x, y);
 
+          // definindo o log para o devido alvo atacado
+          if (alvo == 'B'){
+            result = partida.getBarcoDestruido();
+          } else if (alvo == '~') {
+            result = partida.getTiroNaAgua();
+          } else if (alvo=='X' && alvo=='*'){
+            result = "Coordenadas já haviam sido atacadas";
+          }
+
+          print(jogador.getNome()+" ataca nas coordenadas ("+ x +","+ y +")\n"+ result);
+          ostream.writeObject(jogador.getNome()+" ataca nas coordenadas ("+ x +","+ y +")\n"+ result); // envia log pro cliente
+          // envia atualização da partida para o lado cliente
+          ostream.writeObject(partida);
+          ostream.flush();
           partida.printServerTab();
           iteration++;
 
@@ -118,7 +134,12 @@ public class Start {
           // recebe as coordenadas do atque do cliente
           coord = (int[]) istream.readObject();
           partida.jogadorAtaca(2, coord[0], coord[1]);
+          print(oponente.getNome()+" ataca nas coordenadas ("+coord[0]+","+coord[1]+")");
 
+          ostream.writeObject(partida);
+          ostream.flush();
+          partida.printServerTab();
+          iteration++;
         }
       }
 

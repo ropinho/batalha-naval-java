@@ -90,6 +90,7 @@ public class Start {
       int turno; // var para verificar de quem é a vez de atacar
       int x, y;  // coordenadas do ataque
       int[] coord = new int[2];
+      String log;
 
       print("==============================:");
       print(" Iniciando a Batalha");
@@ -107,13 +108,21 @@ public class Start {
           System.out.print("y: ");
           coord[1] = in.nextInt(); // coordenada y
           ostream.writeObject(coord);
-
-          partida.printClientTab();
+          print(jogador.getNome()+" ataca nas coordenadas ("+coord[0]+","+coord[1]+")");
 
         } else { // vez do servidor, esperar...
           print("Vez de "+ oponente.getNome() +". Esperando...");
+          log = (String) istream.readObject();
+          print(log);
+
         }
-      }
+        // recebe atualização do estado da partida
+        partida = (Partida) istream.readObject();
+        jogador  = partida.getJogador2();
+        oponente = partida.getJogador1();
+        partida.printClientTab();
+
+      }// end of while
 
       ostream.close();
       istream.close();

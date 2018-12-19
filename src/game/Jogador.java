@@ -9,7 +9,8 @@ import java.io.Serializable;
 public class Jogador implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MAX_BARCOS = 5;
+	public static final int MAX_BARCOS = 3; // num máximo de barcos
+	public static final int TAB_SIZE = 8;   // tamanho do tabuleiro
 
 	private byte[] bytes;
 	private String nome;
@@ -20,7 +21,7 @@ public class Jogador implements Serializable {
 
 	public Jogador(String n){
 		this.nome = n;
-		this.tab = new Tabuleiro(5, 5);
+		this.tab = new Tabuleiro(TAB_SIZE, TAB_SIZE);
 	}
 
 	//--- getters e setters -------------------------------------------------//
