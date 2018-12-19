@@ -61,6 +61,11 @@ public class Servidor {
         ostream[i].flush();
       }
 
+      // lista de tabuleiros
+      ArrayList<char[][]> tabuleiros = new ArrayList<>();
+      for (int k=0; k<2; k++)
+        tabuleiros.add(batalha.getJogador(k).getTab());
+
       // iniciar a Batalha
       int i, iteration=0;
       int[] coord = new int[2];
@@ -69,7 +74,7 @@ public class Servidor {
 
       while (batalha.jogadoresPossuemTiros()) {
         i = iteration % 2;
-        print((iteration+1)+ ": " + jogadores[i].getNome() +" ataca");
+        print((iteration+1)+ ": " + batalha.getJogador(i).getNome() +" ataca.\tPontos: "+ batalha.getJogador(i).getPontos() +"\tTiros: "+ batalha.getJogador(i).getTiros());
         // mandar um sinal para os clientes com o índice de quem atacante
         for (int k=0; k<2; k++){
           ostream[k].writeInt(i);
@@ -80,7 +85,7 @@ public class Servidor {
         coord = (int[]) istream[i].readObject();
 
         // efetuar ataque
-        alvo = batalha.jogadorAtaca(i+1, coord[0], coord[1]);
+        alvo = batalha.jogadorAtaca(i, coord[0], coord[1]);
         // verifica alvo/resultado do tiro
         if (alvo == 'B'){
           result = batalha.getBarcoDestruido();
@@ -88,6 +93,11 @@ public class Servidor {
           result = batalha.getTiroNaAgua();
         } else if (alvo=='X' && alvo=='*'){
           result = "Coordenadas já haviam sido atacadas";
+        }
+        // enviar log do resultado do tiro para os clientes
+        for (int k=0; k<2; k++){
+          ostream[k].writeObject(batalha.getJogador(i).getNome() + " atirou nas coordenadas ("+coord[0]+","+coord[1]+")\n"+ result);
+          ostream[k].flush();
         }
 
         iteration++;

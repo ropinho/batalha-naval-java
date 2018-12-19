@@ -54,6 +54,10 @@ public class Jogador implements Serializable {
 		return this.tab.tab;
 	}
 
+	public void setTab(char[][] matriz){
+		this.tab.setTab(matriz);
+	}
+
 	// retorna o caractere da posição específica da matriz do tabuleiro
 	public char getTab(int x, int y){
 		return this.tab.tab[x][y];
@@ -70,7 +74,7 @@ public class Jogador implements Serializable {
 		this.tab.print();
 	}
 
-	public void printTabSecret(){
+	public void printTabSecret() {
 		//System.out.println("Mapa de "+ this.nome);
 		this.tab.printSecret();
 	}
@@ -85,18 +89,3 @@ public class Jogador implements Serializable {
 			System.out.println("Número máximo de barcos excedido.");
 		}
 	}
-
-	/* método usado para atacar um inimigo
-	 * passando como parâmetros: o inimigo, e as coordenadas x e y do tabuleiro do inimigo
-	 * retorna o caractere que estava na posição que foi atacada */
-	public char atacar(Jogador inimigo, int x, int y){
-		// se a posição passada já tiver sido atacada (estará marcada com um 'X')
-		char c = ' ';
-		if (inimigo.getTab(x,y) != 'X'){ // se a posição for diferente de X
-			c = inimigo.getTab(x,y); // pega o caractere
-			inimigo.setTab(x, y, 'X');  // muda a posição atacada para 'X'
-			this.n_tiros--; // diminui num de tiros
-		}
-		return c;
-	}
-}

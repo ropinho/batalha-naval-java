@@ -89,6 +89,7 @@ public class Cliente {
       print("==============================:");
       int sinal, x, y;
       int[] coord = new int[2];
+      String log;
 
       while (batalha.jogadoresPossuemTiros()) {
         // receber o sinal para definir quem ataca
@@ -107,6 +108,9 @@ public class Cliente {
         } else {
           print("Vez de "+ batalha.getJogador(sinal).getNome() +". Espere...");
         }
+        // receber log do resultado do tiro
+        log = (String)istream.readObject();
+        print(log);
       }
 
       // fechando streams e socket

@@ -22,15 +22,11 @@ public class Batalha implements Serializable {
   public Jogador getJogador(int i){
     return this.jogador[i];
   }
-  public Jogador getJogador1(){
-    return this.jogador[0];
-  }
-  public Jogador getJogador2(){
-    return this.jogador[1];
-  }
+
   public String getBarcoDestruido(){
     return BARCO_DESTRUIDO;
   }
+  
   public String getTiroNaAgua(){
     return TIRO_NA_AGUA;
   }
@@ -47,16 +43,21 @@ public class Batalha implements Serializable {
   }
 
 
+  public void jogadorGanhaPonto(int i){
+    this.jogador[i].setPontos(this.jogador[i].getPontos() + 1);
+  }
+
+
   // jogador ataca o outro jogador nas coordenadas passadas
   // retorna o caractere alvo do tiro
-  public char jogadorAtaca(int ij, int x, int y) {
+  public char jogadorAtaca(int i, int x, int y) {
     char alvo = '_';
-    if (ij > 0 && ij < 3){
+    if (i >= 0 && i < 2){
       Jogador atk, def=null;
-      atk = jogador[ij-1];
-      if (ij == 1){
+      atk = jogador[i];
+      if (i == 0){
         def = this.jogador[1];
-      } else if (ij == 2){
+      } else if (i == 1){
         def = this.jogador[0];
       }
       alvo = def.getTab(x,y);
@@ -69,7 +70,6 @@ public class Batalha implements Serializable {
         // troca por '*' para indicar que aquele já foi atirado
         def.setTab(x,y,'*');
       }
-
     }
     return alvo;
   }
