@@ -16,7 +16,7 @@ public class Start {
   static Socket socket;
   static String ip;
   static Scanner in;
-  static Jogador jogador;
+  static Jogador jogador, oponente;
   static Partida partida;
 
   static ObjectInputStream istream;
@@ -79,12 +79,41 @@ public class Start {
       ostream.flush();
 
       // receber o obj batalha
-      print("aguardando batalha...");
+      print("Aguardando batalha...");
       istream = new ObjectInputStream(socket.getInputStream());
-      print("(...)");
       partida = (Partida) istream.readObject();
-      print("(...)");
+      print("Batalha recebida");
+      oponente = partida.getJogador1();
+      partida.printNomesJogadores();
 
+      boolean finish = false;
+      int turno; // var para verificar de quem é a vez de atacar
+      int x, y;  // coordenadas do ataque
+      int[] coord = new int[2];
+
+      print("==============================:");
+      print(" Iniciando a Batalha");
+      print("==============================:");
+      partida.printClientTab();
+
+      while (!finish) {
+        turno = (int) istream.readInt();
+
+        if (turno > 0){ // sua vez de atacar quando o turno receber o valor 1 do servidor
+          print("Sua vez de atacar. Digite as coordenadas X e Y:");
+          /* recebe os valores X e Y e em seguida envia para o servidor */
+          System.out.print("x: ");
+          coord[0] = in.nextInt(); // coordenada x
+          System.out.print("y: ");
+          coord[1] = in.nextInt(); // coordenada y
+          ostream.writeObject(coord);
+
+          partida.printClientTab();
+
+        } else { // vez do servidor, esperar...
+          print("Vez de "+ oponente.getNome() +". Esperando...");
+        }
+      }
 
       ostream.close();
       istream.close();

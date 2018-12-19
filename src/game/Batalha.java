@@ -14,6 +14,7 @@ public class Batalha extends java.lang.Thread {
 		this.player1 = p1;
 		this.player2 = p2;
 		in = new Scanner(System.in);
+		endgame = false;
 	}
 
 	@Override

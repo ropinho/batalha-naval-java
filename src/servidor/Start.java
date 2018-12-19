@@ -71,18 +71,56 @@ public class Start {
       print("Recebendo jogador adversário...");
       istream = new ObjectInputStream(cliente.getInputStream());
       oponente = (Jogador) istream.readObject();
+      print("Jogadores:");
       print("Você: "+ jogador.getNome());
       print("Adversário: "+ oponente.getNome());
 
       // criar partida
       Partida partida = new Partida(jogador, oponente);
-      print("Partida criada!");
+      partida.printNomesJogadores();
 
       // enviar partida para o adversario
       ostream = new ObjectOutputStream(cliente.getOutputStream());
-      print("Enviando dados da batalha para o outro jogador...");
       ostream.writeObject(partida);
 
+      print("==============================:");
+      print(" Iniciando a Batalha");
+      print("==============================:");
+
+      int iteration=1, x, y;
+      int[] coord = new int[2];
+      Jogador atk, def;
+      partida.printServerTab();
+
+      /* Loop da batalha */
+      while (iteration<=100) {
+        // definindo quem ataca e quem defende e enviando um sinal para o cliente
+        if (iteration%2 == 1){ // se a iteração for ímpar, o servidor ataca
+          // se for a vez do servidor atacar, envia 0 para o cliente
+          ostream.writeInt(0);
+          ostream.flush();
+          print("Sua vez de atacar. Digite as coordenadas X e Y:");
+          System.out.print("x: ");
+          x = in.nextInt();
+          System.out.print("y: ");
+          y = in.nextInt();
+          partida.jogadorAtaca(1, x, y);
+
+          partida.printServerTab();
+          iteration++;
+
+        } else { //-----------------------------------------------------------------------------//
+          // se a iteração for par, o cliente ataca e o servidor recebe as coordenadas do ataque
+          // envia o valor 1 para o cliente para sinalizar a vez dele de atacar
+          ostream.writeInt(1);
+          ostream.flush();
+          print("Vez de "+ oponente.getNome() +". Esperando...");
+          // recebe as coordenadas do atque do cliente
+          coord = (int[]) istream.readObject();
+          partida.jogadorAtaca(2, coord[0], coord[1]);
+
+        }
+      }
 
 
       istream.close();

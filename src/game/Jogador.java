@@ -65,8 +65,13 @@ public class Jogador implements Serializable {
 	//----------------------------------------------------------------------//
 
 	public void printTab(){
-		System.out.println("Mapa de "+ this.nome);
+		//System.out.println("Mapa de "+ this.nome);
 		this.tab.print();
+	}
+
+	public void printTabSecret(){
+		//System.out.println("Mapa de "+ this.nome);
+		this.tab.printSecret();
 	}
 
 	public void posicionarBarco(int x, int y) {

@@ -61,7 +61,7 @@ public class Tabuleiro implements Serializable {
 
 			for (int k=0; k<sizeY; k++){
 				if (tab[i][k] == '~' || tab[i][k] == 'B')
-					System.out.printf("* ");
+					System.out.printf("~ ");
 				else
 					System.out.printf("%c ", tab[i][k]);
 			} // imprime linha inteira
