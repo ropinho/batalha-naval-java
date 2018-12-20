@@ -23,11 +23,13 @@ public class Servidor {
   static Scanner in = new Scanner(System.in);
   static ObjectInputStream[] istream = new ObjectInputStream[2];
   static ObjectOutputStream[] ostream = new ObjectOutputStream[2];
+  static DataInputStream[] dis = new DataInputStream[2];
+  static DataOutputStream[] dos = new DataOutputStream[2];
 
   // constantes string:
-  private static final String BARCO_DESTRUIDO = "-------------------\nBarco destruído!\n--------------------";
-  private static final String TIRO_NA_AGUA = "-------------------\nTiro na Água!\n--------------------";
-  private static final String ALVO_JA_ATACADO = "-------------------\nAlvo já havia sido atacado antes!\n--------------------";
+  private static final String BARCO_DESTRUIDO = "--------------------\nBarco destruído!\n--------------------";
+  private static final String TIRO_NA_AGUA = "--------------------\nTiro na Água!\n--------------------";
+  private static final String ALVO_JA_ATACADO = "--------------------\nAlvo já havia sido atacado antes!\n--------------------";
 
 
   public static void print(String s){
@@ -53,13 +55,27 @@ public class Servidor {
     return "------------Placar------------\n"+ nome1 + ": "+ pontos1 +"\n"+ nome2 +": "+ pontos2 +"\n------------------------------";
   }
 
+  // pegar o índice do jogador com mais pontos
+  public static int indexJogadorComMaisPontos() {
+    int p1 = jogadores[0].getPontos();
+    int p2 = jogadores[1].getPontos();
+    // verifica a maior pontuação para retornar o índice
+    if (p1 > p2)
+      return 0;
+    else if (p2 > p1)
+      return 1;
+    // se não houver um maior que o outro,
+    // significa ue serão iguais, logo, retorne -1
+    return -1;
+  }
+
 
   public static void main(String[] args) {
     int n=0, porta;
     int[] dados = new int[4];
 
     // configurar jogo
-    print("Configure o jogo.");
+    print("Configure o servidor.");
     System.out.print("Número de linhas do tabuleiro: ");
     dados[0] = in.nextInt();
     System.out.print("Número de colunas do tabuleiro: ");
@@ -118,7 +134,7 @@ public class Servidor {
         i = iteration % 2; // indice do jogador que ataca
         if (i==0) def = 1; // indice do jogador que é atacado
         else def = 0;
-        print((iteration+1)+ ": " + jogadores[i].getNome() +" ataca.\t\tPontos: "+ jogadores[i].getPontos() +"\tTiros: "+ jogadores[i].getTiros());
+        print((iteration+1)+ ": " + jogadores[i].getNome() +" ataca.\tTiros: "+ jogadores[i].getTiros());
 
         // mandar um sinal para os clientes com o índice de quem atacante
         // e a string com o placar
@@ -140,14 +156,20 @@ public class Servidor {
         // enviar log do resultado do tiro para os clientes
         for (int k=0; k<2; k++){
           ostream[k].writeObject(jogadores[i].getNome() + " atirou nas coordenadas ("+ coord[0] +","+ coord[1] +")\n"+ result);
-          // envia os jogadores para os clientes
-          ostream[k].writeObject(jogadores);
           ostream[k].flush();
         }
 
         iteration++;
       }
 
+      // enviar um log
+      for (int k=0; k<2; k++){
+        print("FIM DE JOGO!");
+        ostream[k].writeObject("FIM DE JOGO!");
+        ostream[k].flush();
+      }
+
+      String string = in.next();
       // fechando streams e socket
       for (i=0; i<2; i++) {
         istream[i].close();

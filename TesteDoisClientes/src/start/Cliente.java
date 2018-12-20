@@ -120,15 +120,19 @@ public class Cliente {
       print("==============================:");
       print(" Iniciando a Batalha");
       print("==============================:");
-      int sinal, x, y;
+      int sinal, x, y, indexVencedor;
       int[] coord = new int[2];
       String log, placar;
       boolean end = false;
 
-      while (!end) {
+      dos = new DataOutputStream(servidor.getOutputStream());
+      dis = new DataInputStream(servidor.getInputStream());
+
+      // aqui começa o loop ===================================================================================//
+      while (true) {
         // receber o sinal para definir quem ataca
         sinal = (int) istream.readInt();
-        mostrarTabs(myIndex);
+        //mostrarTabs(myIndex);
         placar = (String)istream.readObject();
         print(placar);
 
@@ -142,18 +146,38 @@ public class Cliente {
           coord[0] = in.nextInt(); // coordenada x
           System.out.print("y: ");
           coord[1] = in.nextInt(); // coordenada y
-          ostream.writeObject(coord); // envia
+          ostream.writeObject(coord); // envia as coordenadas
+
+          /* se o sinal for igual ao índice do seu oponente significa que é a vez do mesmo */
         } else if (sinal == oponentIndex) {
           print("Vez de "+ jogadores[oponentIndex].getNome() +". Espere...");
+
+        } else if (sinal == 2){
+          /* Caso o loop do servidor termine ele enviará o sinal=(-1), ou seja, menor que zero
+           * nesse caso a variável boolean "end" é setada para 'true' e o cliente recebe um sinal
+           * com o índice do vencedor ou -1 em caso de empate... */
+          break;
         }
+
         // receber log do resultado do tiro
         log = (String)istream.readObject();
-        jogadores = new Jogador[2];
-        jogadores = (Jogador[])istream.readObject();
         print(log);
       }
 
+      indexVencedor = (int)istream.readInt();
+      print("==============================:");
+      print("Vencedor: "+ jogadores[indexVencedor].getNome());
+      print("==============================:");
+
+      System.out.print("Aperte ENTER para encerrar...");
+      String fim = in.next();
+
+      // enviar confirmação do fim do jogo
+      ostream.writeInt(1);
+      ostream.flush();
+
       // fechando streams e socket
+      print("Encerrando conexão");
       istream.close();
       ostream.close();
       servidor.close();
