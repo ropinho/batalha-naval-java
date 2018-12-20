@@ -27,9 +27,9 @@ public class Servidor {
   static DataOutputStream[] dos = new DataOutputStream[2];
 
   // constantes string:
-  private static final String BARCO_DESTRUIDO = "--------------------\nBarco destruído!\n--------------------";
-  private static final String TIRO_NA_AGUA = "--------------------\nTiro na Água!\n--------------------";
-  private static final String ALVO_JA_ATACADO = "--------------------\nAlvo já havia sido atacado antes!\n--------------------";
+  private static final String BARCO_DESTRUIDO = "------------------------------\nBarco destruído!\n------------------------------";
+  private static final String TIRO_NA_AGUA = "------------------------------\nTiro na Água!\n------------------------------";
+  private static final String ALVO_JA_ATACADO = "------------------------------\nAlvo já havia sido atacado antes!\n------------------------------";
 
 
   public static void print(String s){
@@ -45,6 +45,13 @@ public class Servidor {
     if (tiros > 0)
       return true;
     return false;
+  }
+
+  public static int tirosSobrando(){
+    int tiros=0;
+    for (Jogador j : jogadores)
+      tiros += j.getTiros();
+    return tiros;
   }
 
   public static String placar(){
@@ -99,6 +106,7 @@ public class Servidor {
       print("----------------------------------------");
 
       // enviar dados do jogo para os clientes
+      print("Aguardando jogadores");
       for (int i=0; i<2; i++){
         ostream[i] = new ObjectOutputStream(clientes[i].getOutputStream());
         ostream[i].writeObject(dados);
@@ -129,53 +137,76 @@ public class Servidor {
       char alvo;
       String result = "";
 
-      while (jogadoresPossuemTiros()) {
+      // LOOP ==================================================================================================//
+      int tirosSobrando = tirosSobrando();
+      while (tirosSobrando() >= 0) {
         coord = null; // reseta coordenadas
         i = iteration % 2; // indice do jogador que ataca
         if (i==0) def = 1; // indice do jogador que é atacado
         else def = 0;
-        print((iteration+1)+ ": " + jogadores[i].getNome() +" ataca.\tTiros: "+ jogadores[i].getTiros());
+        //print((iteration+1)+ ": " + jogadores[i].getNome() +" ataca.\tTiros: "+ jogadores[i].getTiros());
 
         // mandar um sinal para os clientes com o índice de quem atacante
         // e a string com o placar
         for (int k=0; k<2; k++){
-          ostream[k].writeInt(i);
-          ostream[k].writeObject( placar() );
-          ostream[k].flush();
+          if (tirosSobrando() == 0) {
+            ostream[k].writeInt(2);
+            ostream[k].writeObject( placar() );
+            ostream[k].flush();
+            //tirosSobrando -=1 ;
+          } else {
+            ostream[k].writeInt(i);
+            ostream[k].writeObject( placar() );
+            ostream[k].flush();
+          }
         }
 
-        // esperar coordenadas do tiro
-        coord = (int[]) istream[i].readObject();
+        if (tirosSobrando() > 0){
+          // esperar coordenadas do tiro
+          coord = (int[]) istream[i].readObject();
 
-        // efetuar ataque
-        alvo = jogadores[i].atacar(jogadores[def], coord[0], coord[1]);
-        if (alvo == 'B') result = BARCO_DESTRUIDO;
-        else if (alvo == '~') result = TIRO_NA_AGUA;
-        else result = ALVO_JA_ATACADO;
+          // efetuar ataque
+          alvo = jogadores[i].atacar(jogadores[def], coord[0], coord[1]);
+          if (alvo == 'B') result = BARCO_DESTRUIDO;
+          else if (alvo == '~') result = TIRO_NA_AGUA;
+          else result = ALVO_JA_ATACADO;
 
-        // enviar log do resultado do tiro para os clientes
-        for (int k=0; k<2; k++){
-          ostream[k].writeObject(jogadores[i].getNome() + " atirou nas coordenadas ("+ coord[0] +","+ coord[1] +")\n"+ result);
-          ostream[k].flush();
+          // enviar log do resultado do tiro para os clientes
+          for (int k=0; k<2; k++){
+            ostream[k].writeObject(jogadores[i].getNome() + " atirou nas coordenadas ("+ coord[0] +","+ coord[1] +")\n"+ result);
+            ostream[k].flush();
+          }
+
+          iteration++;
+
+        } else {
+          // se tirosSobrando == 0
+          break;
         }
 
-        iteration++;
-      }
+      }// fim do while
 
-      // enviar um log
-      for (int k=0; k<2; k++){
-        print("FIM DE JOGO!");
-        ostream[k].writeObject("FIM DE JOGO!");
+      // enviar o índice do vencedor
+      // em caso de empate, indexVencedor = -1
+      int indexVencedor = indexJogadorComMaisPontos();
+      for (int k=0; k<2; k++) {
+        ostream[k].writeInt(indexVencedor);
         ostream[k].flush();
       }
 
-      String string = in.next();
+      // aguarda os clientes encerrarem a conexão
+      String[] str = new String[2];
+      for (int k=0; k<2; k++)
+        str[k] = (String) istream[k].readObject();
+
       // fechando streams e socket
       for (i=0; i<2; i++) {
         istream[i].close();
         ostream[i].close();
         clientes[i].close();
       }
+      print("Conexões encerradas.");
+
     } catch(Exception e){
       System.out.println("Erro: "+ e.toString());
     }

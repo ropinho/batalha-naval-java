@@ -1,8 +1,4 @@
 package game;
-/*
- * by: Ronaldd Pinho
- * ronaldppinho@gmail.com
- */
 
 import java.io.Serializable;
 

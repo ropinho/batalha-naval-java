@@ -47,12 +47,12 @@ public class Cliente {
   // configura o mapa do jogador posicionando os barcos na matriz
   public static void configurePlayerMap(){
     int x, y;
-    System.out.println("Posicione as embarcações usando os índices X e Y.");
+    System.out.println("Posicione as embarcações usando os índices das linhas e colunas.");
     while (jogador.getNumBarcos() < jogador.MAX_BARCOS){
       jogador.printTab();
-			System.out.print("x: ");
+			System.out.print("Linha: ");
 			x = in.nextInt();
-			System.out.print("y: ");
+			System.out.print("Coluna: ");
 			y = in.nextInt();
 			jogador.posicionarBarco(x, y);
 			System.out.printf("Adicionado! (%d/%d)\n", jogador.getNumBarcos(), jogador.MAX_BARCOS);
@@ -75,6 +75,7 @@ public class Cliente {
   		jogadores[0].printTabSecret();
     }
   }
+
 
 
   public static void main(String[] args) {
@@ -100,7 +101,7 @@ public class Cliente {
       ostream = new ObjectOutputStream(servidor.getOutputStream());
       ostream.writeObject(jogador); // escreve o objeto na stream
       ostream.flush();
-      print("OK! Espere o outro jogador...");
+      print("OK! Espere o outro jogador");
 
       // recebe índice do jogador no servidor
       int myIndex = istream.readInt();
@@ -112,7 +113,6 @@ public class Cliente {
       // recebe os vetores com os dois jogadores e os dois tabuleiros
       jogadores = (Jogador[]) istream.readObject();
       tabs = (Tabuleiro[]) istream.readObject();
-      print("Jogadores e tabs recebidos");
       print("Você: "+ jogadores[myIndex].getNome());
       print("Adversário: "+ jogadores[oponentIndex].getNome());
 
@@ -129,7 +129,7 @@ public class Cliente {
       dis = new DataInputStream(servidor.getInputStream());
 
       // aqui começa o loop ===================================================================================//
-      while (true) {
+      while (!end) {
         // receber o sinal para definir quem ataca
         sinal = (int) istream.readInt();
         //mostrarTabs(myIndex);
@@ -139,48 +139,60 @@ public class Cliente {
         /* o sinal enviado pelo servidor contém o índice do jogador que ataca nessa rodada
          * logo, o cliente deve verificar se esse sinal é o seu índice no jogo */
         if (sinal == myIndex){
-          print("Sua vez. Digite as coordenadas X e Y do tiro.");
+          print("Sua vez. Digite as coordenadas (linha e coluna) do tiro.");
           /* recebe os valores X e Y do teclado e em seguida envia para o servidor */
           coord = new int[2];
-          System.out.print("x: ");
+          System.out.print("Linha: ");
           coord[0] = in.nextInt(); // coordenada x
-          System.out.print("y: ");
+          System.out.print("Coluna: ");
           coord[1] = in.nextInt(); // coordenada y
           ostream.writeObject(coord); // envia as coordenadas
 
+          // receber log do resultado do tiro
+          log = (String)istream.readObject();
+          print(log);
+
           /* se o sinal for igual ao índice do seu oponente significa que é a vez do mesmo */
         } else if (sinal == oponentIndex) {
+
           print("Vez de "+ jogadores[oponentIndex].getNome() +". Espere...");
 
+          // receber log do resultado do tiro
+          log = (String)istream.readObject();
+          print(log);
+
         } else if (sinal == 2){
-          /* Caso o loop do servidor termine ele enviará o sinal=(-1), ou seja, menor que zero
+          /* Caso o loop do servidor termine ele enviará o sinal=2,
            * nesse caso a variável boolean "end" é setada para 'true' e o cliente recebe um sinal
            * com o índice do vencedor ou -1 em caso de empate... */
+          print("Acabaram os tiros");
+          end = true;
           break;
         }
-
-        // receber log do resultado do tiro
-        log = (String)istream.readObject();
-        print(log);
       }
 
+      // recebe o índice do jogador vencedor: 0 ou 1
+      // em caso de empate receberá -1.
       indexVencedor = (int)istream.readInt();
-      print("==============================:");
-      print("Vencedor: "+ jogadores[indexVencedor].getNome());
-      print("==============================:");
+      if (indexVencedor > 0){
+        print("+-----------------------------+");
+        print("| \tVencedor: "+ jogadores[indexVencedor].getNome());
+        print("+-----------------------------+");
+      } else if (indexVencedor == -1) {
+        print("+-----------------------------+");
+        print("| \tEmpate!");
+        print("+-----------------------------+");
+      }
 
-      System.out.print("Aperte ENTER para encerrar...");
+      System.out.print("Digite qualquer coisa para desconectar... ");
       String fim = in.next();
 
-      // enviar confirmação do fim do jogo
-      ostream.writeInt(1);
-      ostream.flush();
-
       // fechando streams e socket
-      print("Encerrando conexão");
       istream.close();
       ostream.close();
       servidor.close();
+      print("Conexão Encerrada.");
+
     } catch(Exception e) {
       System.err.println("Erro: "+ e.toString());
     }
