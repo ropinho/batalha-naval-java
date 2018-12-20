@@ -82,10 +82,11 @@ public class Cliente {
     in = new Scanner(System.in);
 
     // conectar: digite a porta em que deseja se conectar
+    System.out.print("Digite o IP do servidor: ");
+    ip = in.next();
     System.out.print("Digite o número da porta para conectar: ");
     int port = in.nextInt();
     try {
-      ip = InetAddress.getLocalHost().getHostAddress();
       servidor = new Socket(ip, port);
       print("Conectado a porta "+ port);
       print("Aguardando outro jogador...");

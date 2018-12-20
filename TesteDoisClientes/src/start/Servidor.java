@@ -3,6 +3,7 @@ package start;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.ObjectOutputStream;
@@ -96,9 +97,11 @@ public class Servidor {
     print("----------------------------------------");
 
     try {
+      String ip = Inet4Address.getLocalHost().getHostAddress();
       servidor = new ServerSocket(porta);
       // aguardar duas conexões e envia os dados do jogo para os clientes
-      print("Aguardando conexões na porta "+ porta);
+
+      print("Aguardando conexões na porta "+ porta +". IP ["+ ip +"]");
       for (n=0; n<2; n++){
         clientes[n] = servidor.accept();
         print("Host conectado: "+ clientes[n].getInetAddress().getHostName()+" ["+ clientes[n].getInetAddress().getHostAddress()+ "]");
