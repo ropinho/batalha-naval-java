@@ -26,7 +26,7 @@ public class Batalha implements Serializable {
   public String getBarcoDestruido(){
     return BARCO_DESTRUIDO;
   }
-  
+
   public String getTiroNaAgua(){
     return TIRO_NA_AGUA;
   }
@@ -52,24 +52,34 @@ public class Batalha implements Serializable {
   // retorna o caractere alvo do tiro
   public char jogadorAtaca(int i, int x, int y) {
     char alvo = '_';
+
     if (i >= 0 && i < 2){
-      Jogador atk, def=null;
+      Jogador atk=null, def=null;
       atk = jogador[i];
       if (i == 0){
-        def = this.jogador[1];
+        //def = this.jogador[1];
+        alvo = jogador[1].getTab(x,y);
+        this.jogador[0].setTiros(this.jogador[0].getTiros()-1); // decrementa o num de tiros do atacante
+        if (alvo == 'B') { // if o alvo tiver um B, atingiu um barco: troca por X
+          this.jogador[1].setTab(x,y,'X');
+          jogadorGanhaPonto(i);
+        } else if(alvo == '~'){ // se o alvo tiver um ~ ... tiro na água:
+          // troca por '*' para indicar que aquele já foi atirado
+          this.jogador[1].setTab(x,y,'*');// atacado muda coord para *
+        }
+
       } else if (i == 1){
-        def = this.jogador[0];
+        alvo = jogador[0].getTab(x,y);
+        this.jogador[1].setTiros(this.jogador[1].getTiros()-1); // decrementa o num de tiros do atacante
+        if (alvo == 'B') { // if o alvo tiver um B, atingiu um barco: troca por X
+          this.jogador[0].setTab(x,y,'X');
+          jogadorGanhaPonto(i);
+        } else if(alvo == '~'){ // se o alvo tiver um ~ ... tiro na água:
+          // troca por '*' para indicar que aquele já foi atirado
+          this.jogador[0].setTab(x,y,'*');// atacado muda coord para *
+        }
       }
-      alvo = def.getTab(x,y);
-      atk.setTiros(atk.getTiros()-1); // decrementa o num de tiros do atacante
-      if (alvo == 'B') {
-        // if o alvo tiver um B, atingiu um barco: troca por X
-        def.setTab(x,y,'X');
-      } else if(alvo == '~'){
-        // se o alvo tiver um ~ ... tiro na água:
-        // troca por '*' para indicar que aquele já foi atirado
-        def.setTab(x,y,'*');
-      }
+
     }
     return alvo;
   }
@@ -100,25 +110,4 @@ public class Batalha implements Serializable {
   		jogador[0].printTabSecret();
     }
   }
-
-  /* imprime os tabuleiros dos dois jogadores
-	public void printClientTab(){
-    // jogador[1] é o cliente
-    System.out.println("Seu tabuleiro:");
-    jogador[1].printTab();
-    // jogador[0] é o servidor
-		System.out.println("Tabuleiro de "+ jogador[0].getNome());
-		jogador[0].printTabSecret();
-	}
-
-  public void printServerTab(){
-    // jogador[0] é o servidor
-    System.out.println("Seu tabuleiro:");
-    jogador[0].printTab();
-    // jogador[1] é o cliente
-		System.out.println("Tabuleiro de "+ jogador[1].getNome());
-		jogador[1].printTabSecret();
-	}
-  */
-
 }

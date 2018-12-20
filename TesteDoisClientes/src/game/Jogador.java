@@ -9,8 +9,7 @@ import java.io.Serializable;
 public class Jogador implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MAX_BARCOS = 3; // num máximo de barcos
-	public static final int TAB_SIZE = 8;   // tamanho do tabuleiro
+	public static int MAX_BARCOS; // num máximo de barcos
 
 	private byte[] bytes;
 	private String nome;
@@ -19,14 +18,24 @@ public class Jogador implements Serializable {
 	private int pontos = 0;
 	private Tabuleiro tab;
 
-	public Jogador(String n){
-		this.nome = n;
-		this.tab = new Tabuleiro(TAB_SIZE, TAB_SIZE);
+	public Jogador(String nome, int linhas, int colunas, int barcos, int tiros){
+		this.nome = nome;
+		this.MAX_BARCOS = barcos;
+		this.n_tiros = tiros;
+		this.tab = new Tabuleiro(linhas, colunas);
 	}
 
 	//--- getters e setters -------------------------------------------------//
 	public String getNome(){
 		return this.nome;
+	}
+
+	public Tabuleiro getTabuleiro(){
+		return this.tab;
+	}
+
+	public void setTabuleiro(Tabuleiro t){
+		this.tab = t;
 	}
 
 	public int getNumBarcos(){
@@ -89,3 +98,19 @@ public class Jogador implements Serializable {
 			System.out.println("Número máximo de barcos excedido.");
 		}
 	}
+
+	public char atacar(Jogador inimigo, int x, int y){
+		char alvo = inimigo.getTab(x, y);
+		this.n_tiros -= 1; // decrementa num de tiros
+
+		if (alvo == 'B'){ // se o alvo for um barco
+			inimigo.setTab(x, y, 'X');
+			this.setPontos(this.pontos + 1);
+		} else if (alvo == '~'){ // se o alvo for água
+			inimigo.setTab(x, y, '*');
+		}
+
+		return alvo;
+	}
+
+}
