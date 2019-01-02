@@ -1,16 +1,11 @@
 package game;
-/*
- * by: Ronaldd Pinho
- * ronaldppinho@gmail.com
- */
 
 import java.io.Serializable;
 
 public class Jogador implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MAX_BARCOS = 3; // num máximo de barcos
-	public static final int TAB_SIZE = 8;   // tamanho do tabuleiro
+	public static int MAX_BARCOS; // num máximo de barcos
 
 	private byte[] bytes;
 	private String nome;
@@ -19,14 +14,24 @@ public class Jogador implements Serializable {
 	private int pontos = 0;
 	private Tabuleiro tab;
 
-	public Jogador(String n){
-		this.nome = n;
-		this.tab = new Tabuleiro(TAB_SIZE, TAB_SIZE);
+	public Jogador(String nome, int linhas, int colunas, int barcos, int tiros){
+		this.nome = nome;
+		this.MAX_BARCOS = barcos;
+		this.n_tiros = tiros;
+		this.tab = new Tabuleiro(linhas, colunas);
 	}
 
 	//--- getters e setters -------------------------------------------------//
 	public String getNome(){
 		return this.nome;
+	}
+
+	public Tabuleiro getTabuleiro(){
+		return this.tab;
+	}
+
+	public void setTabuleiro(Tabuleiro t){
+		this.tab = t;
 	}
 
 	public int getNumBarcos(){
@@ -54,6 +59,10 @@ public class Jogador implements Serializable {
 		return this.tab.tab;
 	}
 
+	public void setTab(char[][] matriz){
+		this.tab.setTab(matriz);
+	}
+
 	// retorna o caractere da posição específica da matriz do tabuleiro
 	public char getTab(int x, int y){
 		return this.tab.tab[x][y];
@@ -70,7 +79,7 @@ public class Jogador implements Serializable {
 		this.tab.print();
 	}
 
-	public void printTabSecret(){
+	public void printTabSecret() {
 		//System.out.println("Mapa de "+ this.nome);
 		this.tab.printSecret();
 	}
@@ -86,17 +95,18 @@ public class Jogador implements Serializable {
 		}
 	}
 
-	/* método usado para atacar um inimigo
-	 * passando como parâmetros: o inimigo, e as coordenadas x e y do tabuleiro do inimigo
-	 * retorna o caractere que estava na posição que foi atacada */
 	public char atacar(Jogador inimigo, int x, int y){
-		// se a posição passada já tiver sido atacada (estará marcada com um 'X')
-		char c = ' ';
-		if (inimigo.getTab(x,y) != 'X'){ // se a posição for diferente de X
-			c = inimigo.getTab(x,y); // pega o caractere
-			inimigo.setTab(x, y, 'X');  // muda a posição atacada para 'X'
-			this.n_tiros--; // diminui num de tiros
+		char alvo = inimigo.getTab(x, y);
+		this.n_tiros -= 1; // decrementa num de tiros
+
+		if (alvo == 'B'){ // se o alvo for um barco
+			inimigo.setTab(x, y, 'X');
+			this.setPontos(this.pontos + 1);
+		} else if (alvo == '~'){ // se o alvo for água
+			inimigo.setTab(x, y, '*');
 		}
-		return c;
+
+		return alvo;
 	}
+
 }

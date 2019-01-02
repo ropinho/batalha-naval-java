@@ -17,13 +17,15 @@ public class Tabuleiro implements Serializable {
 		this.initTab();
 	}
 
-
 	public void initTab() {
 		for (int i=0; i<sizeX; i++)
 			for (int k=0; k<sizeY; k++)
 				tab[i][k] = '~';
 	}
 
+	public void setTab(char[][] matriz){
+		this.tab = matriz;
+	}
 
 	/*
 	 * Imprime o tabuleiro com os índices das linhas e colunas
@@ -63,7 +65,7 @@ public class Tabuleiro implements Serializable {
 			for (int k=0; k<sizeY; k++){
 				if (tab[i][k] == '~' || tab[i][k] == 'B')
 					System.out.printf("~ ");
-				else
+				else if (tab[i][k] == '*' || tab[i][k] == 'X')
 					System.out.printf("%c ", tab[i][k]);
 			} // imprime linha inteira
 
